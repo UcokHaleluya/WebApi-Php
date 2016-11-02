@@ -1,0 +1,35 @@
+<?php
+require '../koneksi.php';
+$fields = array(
+		"id"=>true
+	);
+require "../parameter.php";
+$id = $data->id;
+$new_list = array();
+$stmt = $conn->prepare("DELETE FROM pendidikan_dokter WHERE id = ?");
+$stmt->bind_param("i", $id);
+if (!$stmt->execute()) {
+	$pesan = array(
+			"status"=>"gagal",
+			"pesan"=>"terjadi kesalahan server"
+		);
+	echo json_encode($pesan);
+	exit();
+} else {
+	$stmt = $conn->prepare("SELECT * FROM pendidikan_dokter WHERE nopegawai = ?");
+	$stmt->bind_param("i", $data->nopegawai);
+	if ($stmt->execute()) {
+		$res = $stmt->get_result();
+		while ($output = $res->fetch_array(MYSQLI_ASSOC)) {
+			array_push($new_list, $output);	
+		};		
+	}
+	$pesan = array(
+			"status"=>"berhasil",
+			"pesan"=>"pendidikan '" . $pendidikan . "' berhasil ditambahkan",
+			"data"=>$new_list
+		);
+	echo json_encode($pesan);
+	exit();
+};
+?>
